@@ -1,45 +1,52 @@
-CREATE TABLE candidatos(
+CREATE TABLE users (
     id BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
-    nome varchar(255) NOT NULL,
     email varchar(255) NOT NULL UNIQUE,
-    senha varchar(255) NOT NULL,
-    criado_em TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    name varchar(255) NOT NULL,
+    password varchar(255) NOT NULL,
+    role varchar(50) NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
-CREATE TABLE recrutadores(
+CREATE TABLE candidates (
     id BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
-    nome varchar(255) NOT NULL,
-    email varchar(255) NOT NULL UNIQUE,
-    senha varchar(255) NOT NULL,
-    empresa varchar(255)
+    user_id BIGINT NOT NULL UNIQUE,
+
+    CONSTRAINT fk_candidate_user FOREIGN KEY (user_id) REFERENCES users(id)
 );
 
-CREATE TABLE vagas(
+CREATE TABLE recruiters (
     id BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
-    titulo varchar(255) NOT NULL,
-    descricao TEXT NOT NULL,
-    requisitos TEXT NOT NULL,
-    recrutador_id BIGINT NOT NULL,
-    status varchar(50) DEFAULT 'ABERTA',
-    criado_em TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    company varchar(255) NOT NULL,
+    user_id BIGINT NOT NULL UNIQUE,
 
-    CONSTRAINT fk_vaga_recrutador FOREIGN KEY (recrutador_id) REFERENCES recrutadores (id)
+    CONSTRAINT fk_recruiter_user FOREIGN KEY (user_id) REFERENCES users(id)
 );
 
-CREATE TABLE candidaturas(
+CREATE TABLE jobs (
     id BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
-    candidato_id BIGINT NOT NULL,
-    vaga_id BIGINT NOT NULL,
+    title varchar(255) NOT NULL,
+    description TEXT NOT NULL,
+    requirements TEXT NOT NULL,
+    recruiter_id BIGINT NOT NULL,
+    status varchar(50) DEFAULT 'OPEN',
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
 
-    curriculo_url varchar(255) NOT NULL,
-    ia_feedback JSONB,
-    status varchar(50) DEFAULT 'RECEBIDO',
+    CONSTRAINT fk_job_recruiter FOREIGN KEY (recruiter_id) REFERENCES recruiters(id)
+);
 
-    data_aplicacao TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+CREATE TABLE applications (
+    id BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    candidate_id BIGINT NOT NULL,
+    job_id BIGINT NOT NULL,
 
-    match_porcentagem int
+    resume_url varchar(255) NOT NULL,
+    ai_feedback JSONB,
+    status varchar(50) DEFAULT 'RECEIVED',
+    match_percentage int,
+    applied_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
 
-    CONSTRAINT fk_candidatura_candidato FOREIGN KEY(candidato_id) REFERENCES candidatos(id),
-    CONSTRAINT fk_candidatura_vaga FOREIGN KEY(vaga_id) REFERENCES vagas(id),
-    CONSTRAINT fk_candidatura_candidato FOREIGN KEY(candidato_id) REFERENCES candidatos(id)
+
+    CONSTRAINT fk_application_candidate FOREIGN KEY(candidate_id) REFERENCES candidates(id),
+    CONSTRAINT fk_application_job FOREIGN KEY(job_id) REFERENCES jobs(id),
+    CONSTRAINT uk_unique_application UNIQUE(candidate_id, job_id)
 );
