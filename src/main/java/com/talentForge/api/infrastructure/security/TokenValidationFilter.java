@@ -1,7 +1,9 @@
 package com.talentForge.api.infrastructure.security;
 
 import com.talentForge.api.application.service.TokenService;
+import com.talentForge.api.domain.model.roles.UserRoles;
 import com.talentForge.api.domain.repository.UserRepository;
+import com.talentForge.api.infrastructure.persistence.entity.User;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -21,17 +23,22 @@ public class TokenValidationFilter extends OncePerRequestFilter {
     @Autowired
     private TokenService service;
 
-    @Autowired
-    private UserRepository userRepository;
-
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
         var token = fetchToken(request);
 
         if (token != null){
-            String email = service.validateToken(token);
-            var user = userRepository.findByEmail(email)
-                    .orElseThrow(() -> new EntityNotFoundException("Não existe um Usuário com esse email!"));
+            var tokenData = service.validateToken(token);
+
+            var email = tokenData.getSubject();
+            var id = tokenData.getClaim("id").asLong();
+            var role = tokenData.getClaim("role").asString();
+
+            var user = new User();
+            user.setId(id);
+            user.setEmail(email);
+            user.setRoles(UserRoles.valueOf(role));
+
 
             var authentication = new UsernamePasswordAuthenticationToken(user,null,user.getAuthorities());
             SecurityContextHolder.getContext().setAuthentication(authentication);

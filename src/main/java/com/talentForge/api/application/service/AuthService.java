@@ -8,10 +8,13 @@ import com.talentForge.api.infrastructure.persistence.entity.Candidate;
 import com.talentForge.api.infrastructure.persistence.entity.Recruiter;
 import com.talentForge.api.infrastructure.persistence.entity.User;
 import com.talentForge.api.infrastructure.web.dto.request.CandidateRegisterDTO;
+import com.talentForge.api.infrastructure.web.dto.request.LoginDTO;
 import com.talentForge.api.infrastructure.web.dto.request.RecruiterResgisterDTO;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -33,12 +36,18 @@ public class AuthService implements UserDetailsService {
     @Autowired
     private UserRepository userRepository;
 
+    @Autowired
+    private AuthenticationManager manager;
+
+    @Autowired
+    private TokenService tokenService;
+
     @Transactional
     public void registerCandidate(CandidateRegisterDTO data){
         var user = new User();
         user.setEmail(data.email());
-        user.setName(data.nome());
-        user.setPassword(encoder.encode(data.senha()));
+        user.setName(data.name());
+        user.setPassword(encoder.encode(data.password()));
         user.setRoles(UserRoles.CANDIDATE);
 
         var candidate = new Candidate();
@@ -51,8 +60,8 @@ public class AuthService implements UserDetailsService {
     public void registerRecruiter(RecruiterResgisterDTO data){
         var user = new User();
         user.setEmail(data.email());
-        user.setName(data.nome());
-        user.setPassword(encoder.encode(data.senha()));
+        user.setName(data.name());
+        user.setPassword(encoder.encode(data.password()));
         user.setRoles(UserRoles.RECRUITER);
 
         var recruiter = new Recruiter();
@@ -62,12 +71,19 @@ public class AuthService implements UserDetailsService {
         recruiterRepository.save(recruiter);
     }
 
+    @Transactional
+    public String login(LoginDTO data){
+        var authenticadedUser = manager.authenticate(new UsernamePasswordAuthenticationToken(data.email(),data.password()));
+        var tokenJWT = tokenService.generateToken((User) authenticadedUser.getPrincipal());
+
+        return tokenJWT;
+    }
+
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
 
         var user = userRepository.findByEmail(username)
                 .orElseThrow(() -> new EntityNotFoundException("Não existe um Usuário com esse email!"));
-
 
         return user;
     }

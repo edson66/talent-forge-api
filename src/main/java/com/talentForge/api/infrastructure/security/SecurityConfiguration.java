@@ -24,9 +24,9 @@ public class SecurityConfiguration {
         return security.csrf(csfr -> csfr.disable())
                 .sessionManagement(sess -> sess.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> {
-                    auth.requestMatchers(HttpMethod.POST,"/auth/**").permitAll();
-                    auth.requestMatchers(HttpMethod.POST,"/login/**").permitAll();
+                    auth.requestMatchers(HttpMethod.POST,"/auth/recruiter/**","/auth/candidate/**").permitAll();
                     auth.requestMatchers("/swagger-ui.html","/swagger-ui/**","/v3/api-docs/**").permitAll();
+                    auth.requestMatchers(HttpMethod.POST,"/auth/login").permitAll();
                     auth.anyRequest().authenticated();
                 })
                 .addFilterBefore(filter, UsernamePasswordAuthenticationFilter.class)

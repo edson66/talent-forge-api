@@ -8,9 +8,9 @@ public record RecruiterResgisterDTO(
         @Email
         String email,
         @NotBlank
-        String nome,
+        String name,
         @NotBlank
-        String senha,
+        String password,
         @NotBlank
         String company
 ) {

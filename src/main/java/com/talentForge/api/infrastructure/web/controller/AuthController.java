@@ -2,7 +2,9 @@ package com.talentForge.api.infrastructure.web.controller;
 
 import com.talentForge.api.application.service.AuthService;
 import com.talentForge.api.infrastructure.web.dto.request.CandidateRegisterDTO;
+import com.talentForge.api.infrastructure.web.dto.request.LoginDTO;
 import com.talentForge.api.infrastructure.web.dto.request.RecruiterResgisterDTO;
+import com.talentForge.api.infrastructure.web.dto.response.TokenDTO;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -31,5 +33,12 @@ public class AuthController {
 
         service.registerRecruiter(data);
         return ResponseEntity.status(HttpStatus.CREATED).build();
+    }
+
+    @PostMapping("/login")
+    public ResponseEntity loginCandidate(@RequestBody @Valid LoginDTO data){
+        var token = service.login(data);
+
+        return ResponseEntity.ok(new TokenDTO(token));
     }
 }
