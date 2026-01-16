@@ -1,4 +1,4 @@
-package com.talentForge.api.infrastructure.web.dto;
+package com.talentForge.api.infrastructure.web.dto.request;
 
 import java.util.List;
 

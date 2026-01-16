@@ -19,4 +19,8 @@ public class Candidate {
     @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "user_id", referencedColumnName = "id")
     private User user;
+
+    public Candidate(User user) {
+        this.user = user;
+    }
 }

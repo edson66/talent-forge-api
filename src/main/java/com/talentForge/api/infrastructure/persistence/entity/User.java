@@ -1,8 +1,9 @@
 package com.talentForge.api.infrastructure.persistence.entity;
 
 import com.talentForge.api.domain.model.roles.UserRoles;
+import com.talentForge.api.infrastructure.web.dto.request.CandidateRegisterDTO;
+import com.talentForge.api.infrastructure.web.dto.request.RecruiterResgisterDTO;
 import jakarta.persistence.*;
-import jakarta.validation.constraints.Email;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 import org.springframework.security.core.GrantedAuthority;
@@ -25,7 +26,6 @@ public class User implements UserDetails {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    @Email
     private String email;
     private String name;
     private String password;
@@ -36,6 +36,20 @@ public class User implements UserDetails {
     @CreationTimestamp
     @Column(name = "created_at",nullable = false,updatable = false)
     private LocalDateTime createdAt;
+
+    public User(CandidateRegisterDTO data, String encoderPassword) {
+        this.email = data.email();
+        this.name = data.nome();
+        this.password = encoderPassword;
+        this.roles = UserRoles.CANDIDATE;
+    }
+
+    public User(RecruiterResgisterDTO data, String encoderPassword) {
+        this.email = data.email();
+        this.name = data.nome();
+        this.password = encoderPassword;
+        this.roles = UserRoles.RECRUITER;
+    }
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {

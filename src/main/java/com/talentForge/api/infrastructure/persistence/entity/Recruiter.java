@@ -1,6 +1,7 @@
 package com.talentForge.api.infrastructure.persistence.entity;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
 import lombok.*;
 
 @Entity
@@ -21,4 +22,10 @@ public class Recruiter {
     @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "user_id",referencedColumnName = "id")
     private User user;
+
+    public Recruiter(User user, @NotBlank String company) {
+        this.user = user;
+
+        this.company = company;
+    }
 }
