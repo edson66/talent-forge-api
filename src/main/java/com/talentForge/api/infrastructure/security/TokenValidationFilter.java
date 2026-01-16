@@ -1,7 +1,7 @@
 package com.talentForge.api.infrastructure.security;
 
 import com.talentForge.api.application.service.TokenService;
-import com.talentForge.api.infrastructure.persistence.repository.JpaUserRepository;
+import com.talentForge.api.domain.repository.UserRepository;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -22,7 +22,7 @@ public class TokenValidationFilter extends OncePerRequestFilter {
     private TokenService service;
 
     @Autowired
-    private JpaUserRepository userRepository;
+    private UserRepository userRepository;
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {

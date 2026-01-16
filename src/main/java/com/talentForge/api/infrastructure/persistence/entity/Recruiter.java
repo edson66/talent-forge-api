@@ -23,9 +23,4 @@ public class Recruiter {
     @JoinColumn(name = "user_id",referencedColumnName = "id")
     private User user;
 
-    public Recruiter(User user, @NotBlank String company) {
-        this.user = user;
-
-        this.company = company;
-    }
 }

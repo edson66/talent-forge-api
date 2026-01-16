@@ -1,5 +1,6 @@
 package com.talentForge.api.application.service;
 
+import com.talentForge.api.domain.model.roles.UserRoles;
 import com.talentForge.api.domain.repository.CandidateRepository;
 import com.talentForge.api.domain.repository.RecruiterRepository;
 import com.talentForge.api.domain.repository.UserRepository;
@@ -34,18 +35,29 @@ public class AuthService implements UserDetailsService {
 
     @Transactional
     public void registerCandidate(CandidateRegisterDTO data){
-        var user = new User(data, encoder.encode(data.senha()));
+        var user = new User();
+        user.setEmail(data.email());
+        user.setName(data.nome());
+        user.setPassword(encoder.encode(data.senha()));
+        user.setRoles(UserRoles.CANDIDATE);
 
-        var candidate = new Candidate(user);
+        var candidate = new Candidate();
+        candidate.setUser(user);
 
         candidateRepository.save(candidate);
     }
 
     @Transactional
     public void registerRecruiter(RecruiterResgisterDTO data){
-        var user = new User(data, encoder.encode(data.senha()));
+        var user = new User();
+        user.setEmail(data.email());
+        user.setName(data.nome());
+        user.setPassword(encoder.encode(data.senha()));
+        user.setRoles(UserRoles.RECRUITER);
 
-        var recruiter = new Recruiter(user, data.company());
+        var recruiter = new Recruiter();
+        recruiter.setCompany(data.company());
+        recruiter.setUser(user);
 
         recruiterRepository.save(recruiter);
     }

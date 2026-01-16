@@ -5,6 +5,7 @@ import com.talentForge.api.infrastructure.web.dto.request.CandidateRegisterDTO;
 import com.talentForge.api.infrastructure.web.dto.request.RecruiterResgisterDTO;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -19,16 +20,16 @@ public class AuthController {
     private AuthService service;
 
     @PostMapping("/candidate/register")
-    private ResponseEntity resgisterCandidate(@RequestBody @Valid CandidateRegisterDTO data){
+    public ResponseEntity<Void> resgisterCandidate(@RequestBody @Valid CandidateRegisterDTO data){
 
         service.registerCandidate(data);
-        return ResponseEntity.ok().build();
+        return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
     @PostMapping("/recruiter/register")
-    private ResponseEntity resgisterRecruiter(@RequestBody @Valid RecruiterResgisterDTO data){
+    public ResponseEntity<Void> resgisterRecruiter(@RequestBody @Valid RecruiterResgisterDTO data){
 
         service.registerRecruiter(data);
-        return ResponseEntity.ok().build();
+        return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 }

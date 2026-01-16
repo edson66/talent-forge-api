@@ -37,20 +37,6 @@ public class User implements UserDetails {
     @Column(name = "created_at",nullable = false,updatable = false)
     private LocalDateTime createdAt;
 
-    public User(CandidateRegisterDTO data, String encoderPassword) {
-        this.email = data.email();
-        this.name = data.nome();
-        this.password = encoderPassword;
-        this.roles = UserRoles.CANDIDATE;
-    }
-
-    public User(RecruiterResgisterDTO data, String encoderPassword) {
-        this.email = data.email();
-        this.name = data.nome();
-        this.password = encoderPassword;
-        this.roles = UserRoles.RECRUITER;
-    }
-
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return List.of(new SimpleGrantedAuthority(this.roles.name()));
