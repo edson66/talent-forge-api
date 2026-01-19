@@ -1,7 +1,7 @@
 package com.talentForge.api.infrastructure.persistence.entity;
 
 import com.talentForge.api.domain.model.roles.StatusApplication;
-import com.talentForge.api.infrastructure.web.dto.request.FeedbackAiDto;
+import com.talentForge.api.infrastructure.web.dto.request.FeedbackAiDTO;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
@@ -35,7 +35,7 @@ public class Application {
 
     @JdbcTypeCode(SqlTypes.JSON)
     @Column(name = "ai_feedback",columnDefinition = "jsonb")
-    private FeedbackAiDto aiDto;
+    private FeedbackAiDTO aiDto;
 
     @Column(name = "status")
     private StatusApplication statusApplication = StatusApplication.RECEIVED;
