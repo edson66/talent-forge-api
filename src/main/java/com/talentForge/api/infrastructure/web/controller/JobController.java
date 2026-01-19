@@ -3,6 +3,7 @@ package com.talentForge.api.infrastructure.web.controller;
 import com.talentForge.api.application.service.JobService;
 import com.talentForge.api.infrastructure.persistence.entity.Job;
 import com.talentForge.api.infrastructure.persistence.entity.Recruiter;
+import com.talentForge.api.infrastructure.persistence.entity.User;
 import com.talentForge.api.infrastructure.web.dto.request.CreateJobDTO;
 import com.talentForge.api.infrastructure.web.dto.request.FullJobDataDTO;
 import com.talentForge.api.infrastructure.web.dto.request.UpdateJobDTO;
@@ -24,16 +25,13 @@ public class JobController {
     private JobService jobService;
 
     @PostMapping
-    public ResponseEntity<FullJobDataDTO> postJob(@RequestBody @Valid CreateJobDTO data, @AuthenticationPrincipal Recruiter recruiter,
+    public ResponseEntity<FullJobDataDTO> postJob(@RequestBody @Valid CreateJobDTO data, @AuthenticationPrincipal User user,
                                   UriComponentsBuilder builder){
 
-        var job = new Job();
-        job.setTitle(data.title());
-        job.setDescription(data.description());
-        job.setRequirements(data.requirements());
-        job.setRecruiter(recruiter);
+        var job = jobService.saveJob(data,user);
 
-        var uri = jobService.saveJob(job,builder);
+
+        var uri = builder.path("/job/{id}").buildAndExpand(job.getId()).toUri();
 
         return ResponseEntity.created(uri).body(new FullJobDataDTO(job));
     }
@@ -55,17 +53,17 @@ public class JobController {
 
     @PutMapping("/{id}")
     public ResponseEntity<FullJobDataDTO> updateJob(@PathVariable Long id,
-                                    @AuthenticationPrincipal Recruiter recruiter,
+                                    @AuthenticationPrincipal User user,
                                     @RequestBody UpdateJobDTO data){
-        var job = jobService.updateJob(id,recruiter,data);
+        var job = jobService.updateJob(id,user,data);
 
         return ResponseEntity.ok(job);
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> delJob(@PathVariable Long id,@AuthenticationPrincipal Recruiter recruiter){
+    public ResponseEntity<Void> delJob(@PathVariable Long id,@AuthenticationPrincipal User user){
 
-        jobService.deleteJob(id,recruiter);
+        jobService.deleteJob(id,user);
 
         return ResponseEntity.noContent().build();
     }
