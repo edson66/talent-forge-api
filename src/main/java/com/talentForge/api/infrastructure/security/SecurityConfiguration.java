@@ -27,6 +27,11 @@ public class SecurityConfiguration {
                     auth.requestMatchers(HttpMethod.POST,"/auth/recruiter/**","/auth/candidate/**").permitAll();
                     auth.requestMatchers("/swagger-ui.html","/swagger-ui/**","/v3/api-docs/**").permitAll();
                     auth.requestMatchers(HttpMethod.POST,"/auth/login").permitAll();
+
+                    auth.requestMatchers(HttpMethod.POST,"/job/**").hasRole("RECRUITER");
+                    auth.requestMatchers(HttpMethod.PUT,"/job/**").hasRole("RECRUITER");
+                    auth.requestMatchers(HttpMethod.DELETE,"/job/**").hasRole("RECRUITER");
+
                     auth.anyRequest().authenticated();
                 })
                 .addFilterBefore(filter, UsernamePasswordAuthenticationFilter.class)
