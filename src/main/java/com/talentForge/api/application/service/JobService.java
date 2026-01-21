@@ -26,6 +26,11 @@ public class JobService {
     @Autowired
     private RecruiterRepository recruiterRepository;
 
+
+    public Page<FullJobDataDTO> listJobs(Pageable pageable){
+        return jobRepository.findAll(pageable).map(FullJobDataDTO::new);
+    }
+
     @Transactional
     public Job saveJob(CreateJobDTO data, User user){
 
@@ -41,10 +46,6 @@ public class JobService {
         jobRepository.save(job);
 
         return job;
-    }
-
-    public Page<FullJobDataDTO> listJobs(Pageable pageable){
-        return jobRepository.findAll(pageable).map(FullJobDataDTO::new);
     }
 
     public Job findJobById(Long id){
