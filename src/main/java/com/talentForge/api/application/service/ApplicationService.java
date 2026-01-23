@@ -4,11 +4,14 @@ import com.talentForge.api.domain.repository.ApplicationRepository;
 import com.talentForge.api.domain.repository.CandidateRepository;
 import com.talentForge.api.domain.repository.JobRepository;
 import com.talentForge.api.domain.repository.UserRepository;
+import com.talentForge.api.domain.service.FileStorageService;
 import com.talentForge.api.infrastructure.persistence.entity.Application;
 import com.talentForge.api.infrastructure.persistence.entity.User;
 import com.talentForge.api.infrastructure.web.dto.request.FeedbackAiDTO;
-import com.talentForge.api.infrastructure.web.dto.response.ApplicationFeedbackDTO;
+import com.talentForge.api.infrastructure.web.dto.response.ApplicationSummaryDTO;
 import jakarta.persistence.EntityNotFoundException;
+import org.springframework.ai.chat.client.ChatClient;
+import org.springframework.ai.chat.model.ChatModel;
 import org.springframework.ai.reader.tika.TikaDocumentReader;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.InputStreamResource;
@@ -16,6 +19,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.util.List;
+import java.util.Objects;
 
 @Service
 public class ApplicationService {
@@ -29,6 +34,17 @@ public class ApplicationService {
     @Autowired
     private ApplicationRepository applicationRepository;
 
+    @Autowired
+    private FileStorageService fileStorageService;
+
+    private final ChatClient client;
+
+    public ApplicationService(ChatClient.Builder chatBuilder) {
+        this.client = chatBuilder
+                .defaultSystem("Você é um assistente de RH especialista em triagem de currículos.")
+                .build();
+    }
+
     public Application apply(Long jobId, User cadidateUser, MultipartFile resume){
         var job = jobRepository.findById(jobId)
                 .orElseThrow(() -> new EntityNotFoundException("Vaga não encontrada"));
@@ -40,16 +56,39 @@ public class ApplicationService {
 
         var feedback = aiAnalyze(resumeContent,job.getDescription());
 
+        var filename = fileStorageService.uploadFile(resume);
+
         var application = new Application();
         application.setJob(job);
         application.setMatchPercentage(feedback.matchPercentage());
-        application.setResumeUrl();
+        application.setResumeFilename(filename);
         application.setCandidate(candidate);
-        application.setAiDto(new FeedbackAiDTO(feedback.matchPercentage(), feedback.technicalSkills(), feedback.missingSkills(), feedback.reasoning()));
+        application.setAiDto(feedback);
 
         applicationRepository.save(application);
 
         return application;
+    }
+
+    public List<ApplicationSummaryDTO> listApplicationsByJob(Long jobId, User userRecruiter) {
+
+        var job = jobRepository.findById(jobId)
+                .orElseThrow(() -> new EntityNotFoundException("Vaga não encontrada"));
+
+        if (!Objects.equals(job.getRecruiter().getUser().getId(), userRecruiter.getId())){
+            throw new RuntimeException("Vaga pertencente a outro recrutador!");
+        }
+
+        return applicationRepository.findByJobIdOrderByMatchPercentageDesc(jobId)
+                .stream()
+                .map(app -> new ApplicationSummaryDTO(
+                        app.getId(),
+                        app.getCandidate().getUser().getName(),
+                        app.getCandidate().getUser().getEmail(),
+                        app.getMatchPercentage(),
+                        app.getStatusApplication().name()
+                ))
+                .toList();
     }
 
     private String extractTextFromPdf(MultipartFile resume){
@@ -63,7 +102,7 @@ public class ApplicationService {
         }
     }
 
-    public ApplicationFeedbackDTO aiAnalyze(String resumeText,String jobDesc){
+    public FeedbackAiDTO aiAnalyze(String resumeText,String jobDesc){
         String prompt = """
             Analise o seguinte currículo para a vaga descrita.
             Responda APENAS um JSON estrito com os campos: matchPercentage (0-100), technicalSkills, missingSkills e reasoning.
@@ -72,6 +111,23 @@ public class ApplicationService {
             CURRÍCULO: %s
             """.formatted(jobDesc, resumeText);
 
-        return new ApplicationFeedbackDTO(0,"","","");
+        return client.prompt()
+                .user(prompt)
+                .call()
+                .entity(FeedbackAiDTO.class);
+    }
+
+    public Application findApplicationById(Long applicationId) {
+
+        return applicationRepository.findById(applicationId)
+                .orElseThrow(() -> new EntityNotFoundException("Candidatura não encontrada"));
+    }
+
+    public String getResumeUrl(Long applicationId) {
+
+        var application = applicationRepository.findById(applicationId)
+                .orElseThrow(() -> new EntityNotFoundException("Candidatura não encontrada"));
+
+        return fileStorageService.getFileUrl(application.getResumeFilename());
     }
 }

@@ -32,6 +32,9 @@ public class SecurityConfiguration {
                     auth.requestMatchers(HttpMethod.PUT,"/job/**").hasRole("RECRUITER");
                     auth.requestMatchers(HttpMethod.DELETE,"/job/**").hasRole("RECRUITER");
 
+                    auth.requestMatchers(HttpMethod.POST,"/application/**").hasRole("CANDIDATE");
+                    auth.requestMatchers(HttpMethod.GET,"/application/**").hasRole("RECRUITER");
+
                     auth.anyRequest().authenticated();
                 })
                 .addFilterBefore(filter, UsernamePasswordAuthenticationFilter.class)

@@ -31,7 +31,7 @@ public class Application {
     @JoinColumn(name = "job_id",referencedColumnName = "id")
     private Job job;
 
-    private String resumeUrl;
+    private String resumeFilename;
 
     @JdbcTypeCode(SqlTypes.JSON)
     @Column(name = "ai_feedback",columnDefinition = "jsonb")

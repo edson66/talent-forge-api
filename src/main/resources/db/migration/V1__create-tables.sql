@@ -39,7 +39,7 @@ CREATE TABLE applications (
     candidate_id BIGINT NOT NULL,
     job_id BIGINT NOT NULL,
 
-    resume_url varchar(255) NOT NULL,
+    resume_filename varchar(255) NOT NULL,
     ai_feedback JSONB,
     status varchar(50) DEFAULT 'RECEIVED',
     match_percentage int,
