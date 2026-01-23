@@ -5,6 +5,7 @@ import com.talentForge.api.domain.repository.CandidateRepository;
 import com.talentForge.api.domain.repository.JobRepository;
 import com.talentForge.api.domain.repository.UserRepository;
 import com.talentForge.api.domain.service.FileStorageService;
+import com.talentForge.api.domain.service.NotificationService;
 import com.talentForge.api.infrastructure.persistence.entity.Application;
 import com.talentForge.api.infrastructure.persistence.entity.User;
 import com.talentForge.api.infrastructure.web.dto.request.FeedbackAiDTO;
@@ -37,6 +38,9 @@ public class ApplicationService {
     @Autowired
     private FileStorageService fileStorageService;
 
+    @Autowired
+    private NotificationService notificationService;
+
     private final ChatClient client;
 
     public ApplicationService(ChatClient.Builder chatBuilder) {
@@ -45,11 +49,11 @@ public class ApplicationService {
                 .build();
     }
 
-    public Application apply(Long jobId, User cadidateUser, MultipartFile resume){
+    public Application apply(Long jobId, User candidateUser, MultipartFile resume){
         var job = jobRepository.findById(jobId)
                 .orElseThrow(() -> new EntityNotFoundException("Vaga não encontrada"));
 
-        var candidate = candidateRepository.findByEmail(cadidateUser.getEmail())
+        var candidate = candidateRepository.findByEmail(candidateUser.getEmail())
                 .orElseThrow(() -> new EntityNotFoundException("Candidato não encontrado"));
 
         String resumeContent = extractTextFromPdf(resume);
@@ -66,6 +70,24 @@ public class ApplicationService {
         application.setAiDto(feedback);
 
         applicationRepository.save(application);
+
+        if (feedback.matchPercentage() >= 80) {
+            String recruiterEmail = job.getRecruiter().getUser().getEmail();
+            String subject = "Candidato Promissor: " + candidateUser.getName();
+            String body = """
+                Olá Recrutador!
+                O candidato %s acabou de aplicar para a vaga '%s' e teve um match de %d%%!
+                Pontos Fortes: %s
+                """.formatted(candidateUser.getName(), job.getTitle(), feedback.matchPercentage(), feedback.technicalSkills());
+
+            notificationService.notify(recruiterEmail, subject, body);
+        }else{
+            notificationService.notify(
+                    candidateUser.getEmail(),
+                    "Atualização sobre sua candidatura: " + job.getTitle(),
+                    "Olá. Agradecemos seu interesse, mas no momento seu perfil não atingiu os requisitos mínimos..."
+            );
+        }
 
         return application;
     }
