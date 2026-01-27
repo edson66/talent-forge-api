@@ -8,5 +8,5 @@ import java.util.Optional;
 public interface RecruiterRepository {
     void save(Recruiter recruiter);
 
-    Optional<Recruiter> findByEmail(String email);
+    Optional<Recruiter> findByUserEmail(String email);
 }

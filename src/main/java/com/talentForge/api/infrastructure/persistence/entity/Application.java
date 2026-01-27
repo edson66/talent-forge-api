@@ -38,6 +38,7 @@ public class Application {
     private FeedbackAiDTO aiDto;
 
     @Column(name = "status")
+    @Enumerated(EnumType.STRING)
     private StatusApplication statusApplication = StatusApplication.RECEIVED;
     private Integer matchPercentage;
 

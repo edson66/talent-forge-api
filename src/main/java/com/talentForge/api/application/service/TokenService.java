@@ -24,7 +24,7 @@ public class TokenService {
             return JWT.create()
                     .withIssuer("talentForge")
                     .withSubject(user.getEmail())
-                    .withClaim("role",user.getRoles().name())
+                    .withClaim("role",user.getRole().name())
                     .withClaim("id",user.getId())
                     .withExpiresAt(LocalDateTime.now().plusHours(2).toInstant(ZoneOffset.of("-03:00")))
                     .sign(algorithm);

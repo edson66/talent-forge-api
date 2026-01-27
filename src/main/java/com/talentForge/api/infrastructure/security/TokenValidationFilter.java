@@ -37,7 +37,7 @@ public class TokenValidationFilter extends OncePerRequestFilter {
             var user = new User();
             user.setId(id);
             user.setEmail(email);
-            user.setRoles(UserRoles.valueOf(role));
+            user.setRole(UserRoles.valueOf(role));
 
 
             var authentication = new UsernamePasswordAuthenticationToken(user,null,user.getAuthorities());

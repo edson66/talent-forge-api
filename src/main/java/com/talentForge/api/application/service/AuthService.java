@@ -13,6 +13,7 @@ import com.talentForge.api.infrastructure.web.dto.request.RecruiterResgisterDTO;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -37,6 +38,7 @@ public class AuthService implements UserDetailsService {
     private UserRepository userRepository;
 
     @Autowired
+    @Lazy
     private AuthenticationManager manager;
 
     @Autowired
@@ -48,7 +50,7 @@ public class AuthService implements UserDetailsService {
         user.setEmail(data.email());
         user.setName(data.name());
         user.setPassword(encoder.encode(data.password()));
-        user.setRoles(UserRoles.CANDIDATE);
+        user.setRole(UserRoles.CANDIDATE);
 
         var candidate = new Candidate();
         candidate.setUser(user);
@@ -62,7 +64,7 @@ public class AuthService implements UserDetailsService {
         user.setEmail(data.email());
         user.setName(data.name());
         user.setPassword(encoder.encode(data.password()));
-        user.setRoles(UserRoles.RECRUITER);
+        user.setRole(UserRoles.RECRUITER);
 
         var recruiter = new Recruiter();
         recruiter.setCompany(data.company());

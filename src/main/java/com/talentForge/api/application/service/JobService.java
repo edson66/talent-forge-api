@@ -34,7 +34,7 @@ public class JobService {
     @Transactional
     public Job saveJob(CreateJobDTO data, User user){
 
-        var recruiter = recruiterRepository.findByEmail(user.getEmail())
+        var recruiter = recruiterRepository.findByUserEmail(user.getEmail())
                 .orElseThrow(() -> new EntityNotFoundException("Recrutador não encontrado para este usuário."));
 
         var job = new Job();
@@ -58,7 +58,7 @@ public class JobService {
         var job = jobRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Vaga não encontrada para este id"));
 
-        var recruiter = recruiterRepository.findByEmail(user.getEmail())
+        var recruiter = recruiterRepository.findByUserEmail(user.getEmail())
                 .orElseThrow(() -> new EntityNotFoundException("Recrutador não encontrado para este usuário."));
 
         if (Objects.equals(recruiter.getId(), job.getRecruiter().getId())){
@@ -74,7 +74,7 @@ public class JobService {
         var job = jobRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Vaga não encontrada para este id"));
 
-        var recruiter = recruiterRepository.findByEmail(user.getEmail())
+        var recruiter = recruiterRepository.findByUserEmail(user.getEmail())
                 .orElseThrow(() -> new EntityNotFoundException("Recrutador não encontrado para este usuário."));
 
         if (Objects.equals(recruiter.getId(), job.getRecruiter().getId())){

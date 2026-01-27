@@ -5,9 +5,11 @@ import com.talentForge.api.domain.repository.RecruiterRepository;
 import com.talentForge.api.infrastructure.persistence.entity.Candidate;
 import com.talentForge.api.infrastructure.persistence.entity.Recruiter;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Repository;
 
 import java.util.Optional;
 
+@Repository
 public class RecruiterRepositoryImpl implements RecruiterRepository {
 
     @Autowired
@@ -19,7 +21,7 @@ public class RecruiterRepositoryImpl implements RecruiterRepository {
     }
 
     @Override
-    public Optional<Recruiter> findByEmail(String email) {
-        return repository.findByEmail(email);
+    public Optional<Recruiter> findByUserEmail(String email) {
+        return repository.findByUserEmail(email);
     }
 }

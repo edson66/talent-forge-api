@@ -53,7 +53,7 @@ public class ApplicationService {
         var job = jobRepository.findById(jobId)
                 .orElseThrow(() -> new EntityNotFoundException("Vaga não encontrada"));
 
-        var candidate = candidateRepository.findByEmail(candidateUser.getEmail())
+        var candidate = candidateRepository.findByUserEmail(candidateUser.getEmail())
                 .orElseThrow(() -> new EntityNotFoundException("Candidato não encontrado"));
 
         String resumeContent = extractTextFromPdf(resume);

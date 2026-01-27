@@ -31,7 +31,7 @@ public class User implements UserDetails {
     private String password;
 
     @Enumerated(EnumType.STRING)
-    private UserRoles roles;
+    private UserRoles role;
 
     @CreationTimestamp
     @Column(name = "created_at",nullable = false,updatable = false)
@@ -39,7 +39,7 @@ public class User implements UserDetails {
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return List.of(new SimpleGrantedAuthority(this.roles.name()));
+        return List.of(new SimpleGrantedAuthority(this.role.name()));
     }
 
     @Override
