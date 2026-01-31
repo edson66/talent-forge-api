@@ -5,6 +5,9 @@ public record ApplicationSummaryDTO(
         String candidateName,
         String candidateEmail,
         Integer matchPercentage,
+        String iaResolution,
+        String technicalSkills,
+        String missingSkills,
         String status
 ) {
 }

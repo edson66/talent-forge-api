@@ -108,6 +108,9 @@ public class ApplicationService {
                         app.getCandidate().getUser().getName(),
                         app.getCandidate().getUser().getEmail(),
                         app.getMatchPercentage(),
+                        app.getAiDto().reasoning(),
+                        app.getAiDto().technicalSkills(),
+                        app.getAiDto().missingSkills(),
                         app.getStatusApplication().name()
                 ))
                 .toList();
@@ -126,12 +129,25 @@ public class ApplicationService {
 
     public FeedbackAiDTO aiAnalyze(String resumeText,String jobDesc){
         String prompt = """
-            Analise o seguinte currículo para a vaga descrita.
-            Responda APENAS um JSON estrito com os campos: matchPercentage (0-100), technicalSkills, missingSkills e reasoning.
-            
-            VAGA: %s
-            CURRÍCULO: %s
-            """.formatted(jobDesc, resumeText);
+        Você é um sistema backend que responde APENAS JSON.
+        Analise o currículo abaixo para a vaga descrita.
+        
+        Regras de Saída:
+        1. Responda APENAS o JSON puro. Não use Markdown (```json). Não coloque texto introdutório.
+        2. Mantenha as chaves do JSON exatamente em inglês como no modelo abaixo.
+        3. O CONTEÚDO dos valores (reasoning, skills) deve ser em Português (PT-BR).
+        
+        Modelo de Resposta:
+        {
+           "matchPercentage": (inteiro de 0 a 100),
+           "technicalSkills": "Java, Spring, Docker...",
+           "missingSkills": "AWS, Kubernetes...",
+           "reasoning": "O candidato possui..."
+        }
+        
+        VAGA: %s
+        CURRÍCULO: %s
+        """.formatted(jobDesc, resumeText);
 
         return client.prompt()
                 .user(prompt)
