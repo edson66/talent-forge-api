@@ -47,3 +47,42 @@ com.talentForge.api
 ├── application      # Casos de uso (Services)
 ├── domain           # Entidades, Interfaces de Repositório e Regras de Negócio (Core)
 └── infrastructure   # Implementações (JPA, Controllers, Configs, Security, External APIs)
+```
+
+##  Como Rodar o Projeto Localmente
+
+Para executar a aplicação em ambiente de desenvolvimento, utilizamos o Docker para a infraestrutura (Banco de Dados e IA Local) e rodamos a API via IDE ou Maven.
+
+###  Pré-requisitos
+* [Docker Desktop](https://www.docker.com/products/docker-desktop/) instalado e rodando.
+* [Java JDK 21](https://adoptium.net/) instalado.
+* [Maven](https://maven.apache.org/) instalado.
+
+### 👣 Passo a Passo
+
+#### 1. Clone o repositório
+```bash
+git clone [https://github.com/edson66/talent-forge-api.git](https://github.com/edson66/talent-forge-api.git)
+cd talent-forge-api 
+```
+
+#### 2. Suba a Infraestrutura (Banco + Ollama)
+```bash
+docker-compose up -d
+```
+
+#### 3. Configure o Modelo de IA (Apenas na primeira vez)
+```bash
+docker exec -it talentforge-ollama ollama pull llama3
+```
+
+#### 4. Execute a Aplicação
+```bash
+mvn spring-boot:run
+```
+
+#### 5. Acesse a Documentação
+Com a aplicação rodando, acesse:
+```bash
+Swagger UI: http://localhost:8080/swagger-ui.html
+```
